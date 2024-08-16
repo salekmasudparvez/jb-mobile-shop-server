@@ -78,6 +78,7 @@ async function run() {
       const result = await productCollection.insertOne(product);
       res.json(result);
     })
+
     app.get('/category', async (req, res) => {
       try {
         const categories = await productCollection.aggregate([
@@ -99,16 +100,58 @@ async function run() {
         res.status(500).json({ message: "Error fetching categories", error });
       }
     });
+    app.get('/brands', async (req, res) => {
+      try {
+        // Aggregation pipeline to get distinct brands
+        const brands = await productCollection.aggregate([
+          {
+            $group: {
+              _id: "$brand" // Group by brand field
+            }
+          },
+          {
+            $project: {
+              _id: 0,        // Exclude the _id field
+              brand: "$_id"  // Rename _id to brand
+            }
+          }
+        ]).toArray(); // Convert the cursor to an array
+    
+        res.json(brands); // Respond with the list of brands
+      } catch (error) {
+        console.error('Error fetching brands:', error); // Log the error for debugging
+        res.status(500).json({ message: "Error fetching brands", error }); // Send error response
+      }
+    });
+    
+
     app.get('/products', async (req, res) => {
       try {
-        const search = req.query.search || ''; // Default to empty string if no search query
+        const search = req.query.search || ''; 
+        const category = req.query.category || '';
+        const brand = req.query.brand || '';
+        const minPrice = parseFloat(req.query.minPrice) || 0; 
+        const maxPrice = parseFloat(req.query.maxPrice) || Number.MAX_VALUE;
+        console.log(minPrice,maxPrice)
         let query = {};
     
         if (search) {
           // Use a case-insensitive regex for more flexible search
-          query = { name: { $regex: new RegExp(search, 'i') } };
+          query.name = { $regex: new RegExp(search, 'i') };
         }
     
+        if (category) {
+          query.category = category;
+        }
+    
+        if (brand) {
+          query.brand = brand;
+        }
+    
+        if (minPrice || maxPrice < Number.MAX_VALUE) {
+          query.price = { $gte: minPrice, $lte: maxPrice };
+        }
+        console.log(query)
         const products = await productCollection.find(query).toArray();
         res.json(products);
       } catch (error) {
