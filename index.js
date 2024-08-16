@@ -64,9 +64,10 @@ async function run() {
         });
           
         const imageUrl = response.data.data.link;
+        console.log(imageUrl)
         res.json({ imageUrl });
       } catch (error) {
-        console.error(error);
+        console.error(error.message);
         res.status(500).json({ error: 'Image upload failed' });
       }
     });
@@ -77,6 +78,46 @@ async function run() {
       const result = await productCollection.insertOne(product);
       res.json(result);
     })
+    app.get('/category', async (req, res) => {
+      try {
+        const categories = await productCollection.aggregate([
+          {
+            $group: {
+              _id: "$category"
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              category: "$_id"
+            }
+          }
+        ]).toArray(); // Convert the cursor to an array
+    
+        res.json(categories);
+      } catch (error) {
+        res.status(500).json({ message: "Error fetching categories", error });
+      }
+    });
+    app.get('/products', async (req, res) => {
+      try {
+        const search = req.query.search || ''; // Default to empty string if no search query
+        let query = {};
+    
+        if (search) {
+          // Use a case-insensitive regex for more flexible search
+          query = { name: { $regex: new RegExp(search, 'i') } };
+        }
+    
+        const products = await productCollection.find(query).toArray();
+        res.json(products);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+    });
+    
+    
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful connection
