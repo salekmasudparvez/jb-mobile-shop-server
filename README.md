@@ -33,4 +33,5 @@ Replace the environment variables
 - VITE_messagingSenderId
 - VITE_appId
 
-- [Live link](https://mobileshop-pro.netlify.app/)
+
+ [Live link](https://mobileshop-pro.netlify.app/)
