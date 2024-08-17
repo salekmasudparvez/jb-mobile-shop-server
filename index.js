@@ -12,7 +12,7 @@ const corsOptions = {
     "http://localhost:5173",
     "https://mobile-shop-pro.vercel.app",
     "http://localhost:5000",
-    "https://mobileshop-pro.netlify.app/",
+    "https://mobileshop-pro.netlify.app",
   ],
   credentials: true,
   optionSuccessStatus: 200,
