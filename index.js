@@ -147,7 +147,7 @@ async function run() {
         const sort = req.query.sort;
         //console.log(minPrice,maxPrice)
         let query = {};
-        let sortDoc = {}
+        let sortDoc={date:-1}
         if (sort === "pDown") {
           sortDoc={price:1}
         }else if(sort === "pUp") {
