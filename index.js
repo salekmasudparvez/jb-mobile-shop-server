@@ -10,8 +10,9 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const corsOptions = {
   origin: [
     "http://localhost:5173",
-    "http://localhost:5174",
+    "https://mobile-shop-pro.vercel.app",
     "http://localhost:5000",
+    "https://mobileshop-pro.netlify.app/",
   ],
   credentials: true,
   optionSuccessStatus: 200,
