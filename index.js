@@ -130,9 +130,12 @@ async function run() {
         const search = req.query.search || ''; 
         const category = req.query.category || '';
         const brand = req.query.brand || '';
+        const tab = req.query.tab || '';
         const minPrice = parseFloat(req.query.minPrice) || 0; 
         const maxPrice = parseFloat(req.query.maxPrice) || Number.MAX_VALUE;
-        console.log(minPrice,maxPrice)
+        const page = parseInt(req.query.page);
+        const size = parseInt(req.query.size);
+        //console.log(minPrice,maxPrice)
         let query = {};
     
         if (search) {
@@ -143,7 +146,10 @@ async function run() {
         if (category) {
           query.category = category;
         }
-    
+        if(tab){
+          query.category = tab;
+        }
+         console.log(query)
         if (brand) {
           query.brand = brand;
         }
@@ -152,12 +158,17 @@ async function run() {
           query.price = { $gte: minPrice, $lte: maxPrice };
         }
         console.log(query)
-        const products = await productCollection.find(query).toArray();
+        const products = await productCollection.find(query).skip(page * size)
+        .limit(size).toArray();
         res.json(products);
       } catch (error) {
         console.error('Error fetching products:', error);
         res.status(500).json({ error: 'Internal Server Error' });
       }
+    });
+    app.get("/count", async (req, res) => {
+      const count = await productCollection.estimatedDocumentCount();
+      res.send({ count });
     });
     
     
