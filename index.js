@@ -41,10 +41,10 @@ async function run() {
     app.post("/register", async (req, res) => {
       const newUser = req.body;
       const existingUser = await usersCollection.findOne({
-        name: newUser?.name,
+        email: newUser?.email
       });
       if (existingUser) {
-        return res.status(400).json({ message: "Username already exists" });
+        return res.status(400).json({ message: "User already exists" });
       }
       const result = await usersCollection.insertOne(newUser);
       res.json(result);
@@ -56,7 +56,7 @@ async function run() {
     });
     app.post("/imageUpload", upload.single("image"), async (req, res) => {
       const imageBuffer = req.file.buffer;
-      //console.log(imageBuffer,'line57')
+   
       try {
         const response = await axios.post(
           "https://api.imgur.com/3/image",
@@ -70,7 +70,7 @@ async function run() {
         );
 
         const imageUrl = response.data.data.link;
-        console.log(imageUrl);
+     
         res.json({ imageUrl });
       } catch (error) {
         console.error(error.message);
@@ -80,7 +80,7 @@ async function run() {
 
     app.post("/productUpload", async (req, res) => {
       const product = req.body;
-      console.log(product);
+     
       const result = await productCollection.insertOne(product);
       res.json(result);
     });
@@ -145,7 +145,7 @@ async function run() {
         const page = parseInt(req.query.page);
         const size = parseInt(req.query.size);
         const sort = req.query.sort;
-        //console.log(minPrice,maxPrice)
+     
         let query = {};
         let sortDoc={date:-1}
         if (sort === "pDown") {
@@ -168,7 +168,7 @@ async function run() {
         if (tab) {
           query.category = tab;
         }
-        console.log(query);
+      
         if (brand) {
           query.brand = brand;
         }
@@ -176,7 +176,7 @@ async function run() {
         if (minPrice || maxPrice < Number.MAX_VALUE) {
           query.price = { $gte: minPrice, $lte: maxPrice };
         }
-        console.log(query);
+   
         const products = await productCollection
           .find(query)
           .skip(page * size)
@@ -192,12 +192,12 @@ async function run() {
 
     app.get('/details/:id', async(req, res) => {
       const id = req.params.id;
-      //console.log(id)
+  
       const response = await productCollection.findOne({_id: new ObjectId(id)});
-      console.log(response)
+     
       res.send(response);
     })
-    
+
     app.get("/count", async (req, res) => {
       const count = await productCollection.estimatedDocumentCount();
       res.send({ count });
