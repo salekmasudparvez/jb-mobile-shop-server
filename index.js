@@ -189,6 +189,15 @@ async function run() {
         res.status(500).json({ error: "Internal Server Error" });
       }
     });
+
+    app.get('/details/:id', async(req, res) => {
+      const id = req.params.id;
+      //console.log(id)
+      const response = await productCollection.findOne({_id: new ObjectId(id)});
+      console.log(response)
+      res.send(response);
+    })
+    
     app.get("/count", async (req, res) => {
       const count = await productCollection.estimatedDocumentCount();
       res.send({ count });
